@@ -676,6 +676,7 @@ impl VhostUserBackend for VhostUserSoundBackend {
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
+
     use tempfile::tempdir;
     use virtio_bindings::virtio_ring::VRING_DESC_F_WRITE;
     use virtio_queue::{mock::MockSplitQueue, Descriptor};

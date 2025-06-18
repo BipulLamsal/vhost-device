@@ -150,15 +150,20 @@ impl Drop for PwBackend {
 
 impl AudioBackend for PwBackend {
     fn write(&self, stream_id: u32) -> Result<()> {
-        if !matches!(
-            self.stream_params.read().unwrap()[stream_id as usize].state,
-            PCMState::Start | PCMState::Prepare
-        ) {
-            return Err(Error::Stream(crate::stream::Error::InvalidState(
-                "write",
-                self.stream_params.read().unwrap()[stream_id as usize].state,
-            )));
-        }
+        println!(
+            "state: {:?}",
+            self.stream_params.read().unwrap()[stream_id as usize].state
+        );
+        // if !matches!(
+        //     self.stream_params.read().unwrap()[stream_id as usize].state,
+        //     PCMState::Start | PCMState::Prepare
+        // ) {
+        //     return Err(Error::Stream(crate::stream::Error::InvalidState(
+        //         "write",
+        //         self.stream_params.read().unwrap()[stream_id as usize].state,
+        //     )));
+        // }
+        println!("write completed");
         Ok(())
     }
 
@@ -202,6 +207,7 @@ impl AudioBackend for PwBackend {
 
     fn prepare(&self, stream_id: u32) -> Result<()> {
         debug!("pipewire prepare");
+        println!("pipewire prepared");
         let prepare_result = self
             .stream_params
             .write()
@@ -383,6 +389,7 @@ impl AudioBackend for PwBackend {
                 .process(move |stream, _data| match stream.dequeue_buffer() {
                     None => debug!("No buffer recieved"),
                     Some(mut req) => {
+                        println!("request: {:?}", req.datas_mut());
                         match direction {
                             Direction::Input => {
                                 let datas = req.datas_mut();
@@ -535,6 +542,7 @@ impl AudioBackend for PwBackend {
     }
 
     fn start(&self, stream_id: u32) -> Result<()> {
+        println!("Started");
         debug!("pipewire start");
         let start_result = self
             .stream_params

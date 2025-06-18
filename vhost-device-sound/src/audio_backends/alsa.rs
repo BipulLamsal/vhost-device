@@ -433,12 +433,14 @@ fn alsa_worker(
             return Ok(());
         };
         if do_work {
+            println!("sanjay kumar time machine activate");
             let has_buffers = || -> bool {
                 // Hold `streams` lock as short as possible.
                 let lck = streams.read().unwrap();
                 !lck[stream_id].requests.is_empty()
                     && matches!(lck[stream_id].state, PCMState::Start)
             };
+
             // Run this loop till the stream's buffer vector is empty:
             'empty_buffers: while has_buffers() {
                 // When we return from a read/write attempt and there is still space in the
@@ -456,6 +458,7 @@ fn alsa_worker(
                                     &mut streams.write().unwrap()[stream_id],
                                     mmap,
                                 )? {
+                                    println!("completed written");
                                     continue 'empty_buffers;
                                 }
                             } else {
@@ -562,6 +565,7 @@ impl AudioBackend for AlsaBackend {
     }
 
     fn write(&self, stream_id: u32) -> CrateResult<()> {
+        println!("write function is first line");
         if stream_id >= self.streams.read().unwrap().len() as u32 {
             log::error!(
                 "Received DoWork action for stream id {} but there are only {} PCM streams.",
@@ -581,10 +585,12 @@ impl AudioBackend for AlsaBackend {
                 self.streams.read().unwrap()[stream_id as usize].state,
             )));
         }
+        println!("write function is last line");
         Ok(())
     }
 
     fn start(&self, stream_id: u32) -> CrateResult<()> {
+        println!("start first line");
         if stream_id >= self.streams.read().unwrap().len() as u32 {
             log::error!(
                 "Received Start action for stream id {} but there are only {} PCM streams.",
@@ -612,11 +618,14 @@ impl AudioBackend for AlsaBackend {
                 return Err(Error::UnexpectedAudioBackendError(err.into()));
             }
         }
+
         self.senders[stream_id as usize].send(true).unwrap();
+        println!("start last line");
         Ok(())
     }
 
     fn prepare(&self, stream_id: u32) -> CrateResult<()> {
+        println!("preparing!!!!");
         if stream_id >= self.streams.read().unwrap().len() as u32 {
             log::error!(
                 "Received Prepare action for stream id {} but there are only {} PCM streams.",

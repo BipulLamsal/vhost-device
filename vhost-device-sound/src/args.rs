@@ -25,4 +25,6 @@ pub enum BackendType {
     Pipewire,
     #[cfg(all(feature = "alsa-backend", target_env = "gnu"))]
     Alsa,
+    #[cfg(all(feature = "gs-backend", target_env = "gnu"))]
+    GStreamer,
 }
